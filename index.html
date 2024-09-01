@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .invalid {
+      color: hsl(0, 100%, 67%) !important;
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            purple: 'hsl(259, 100%, 65%)',
+            light_red: 'hsl(0, 100%, 67%)',
+            white: 'hsl(0, 0%, 100%)',
+            off_white: 'hsl(0, 0%, 94%)',
+            light_grey: 'hsl(0, 0%, 86%)',
+            smokey_grey: 'hsl(0, 1%, 44%)',
+            off_black: 'hsl(0, 0%, 8%)',
+          }
+        }
+      }
+    }
+  </script>
+  <title>Frontend Mentor | Age calculator app</title>
+</head>
+
+<body class="bg-off_white mt-20 container sm:w-12/12 lg:w-6/12 xl:w-5/12 sm:mx-auto sm:h-screen">
+  <main class="p-7 bg-white m-5 rounded-3xl  rounded-br-[5.5rem] ">
+    <div class="flex gap-1 sm:gap-5 flex-wrap justify-between">
+      <div>
+        <label for="day" class="block tracking-[.25em] text-xs font-extrabold my-1 text-smokey_grey">DAY</label>
+        <input type="number" name="day" class="w-20 sm:w-48 border rounded-md text-lg font-bold p-2" id="day"
+          pattern="(0[1-9]|[12]\d|3[01])" name="day" min="1" max="31" placeholder="DD" required>
+        <span class="block text-light_red italic" id="day_validate_text"></span>
+      </div>
+      <div>
+        <label for="month"
+          class="block tracking-[.25em] text-xs text-sm font-extrabold my-1 text-smokey_grey">MONTH</label>
+        <input type="number" class="w-20 sm:w-48 border rounded-md text-lg font-bold p-2" id="month"
+          pattern="(0[1-9]|1[012])" name="month" min="1" max="12" placeholder="MM" required>
+        <span class="block text-light_red italic" id="month_validate_text"></span>
+      </div>
+      <div>
+        <label for="year"
+          class="block tracking-[.25em] text-xs text-sm font-extrabold my-1 text-smokey_grey">YEAR</label>
+        <input type="number" class="w-20 sm:w-48 border rounded-md text-lg font-bold p-2" id="year"
+          pattern="^(19|20)\d{2}$" name="year" min="2000" placeholder="YYYY" required>
+        <span class="block text-light_red italic" id="year_validate_text"></span>
+
+      </div>
+    </div>
+
+    <div class="relative grid my-5">
+      <div class="absolute top-1/2 z-10 w-full border-b-2"></div>
+      <button onclick="submitBirthDay()"
+        class="sm:place-self-end z-20 place-self-center bg-purple hover:bg-off_black rounded-full"><img class="p-3 w-13"
+          src="./assets/images/icon-arrow.svg" alt=""></button>
+    </div>
+    <section class="">
+      <div class="text-[3rem] sm:text-[5rem] font-extrabold flex gap-2 content-center items-center">
+        <span class="text-purple" id="years">_ _</span>
+        <p>years</p>
+      </div>
+      <div class="text-[3rem] sm:text-[5rem] font-extrabold flex gap-2 content-center items-center">
+        <span class="text-purple" id="months">_ _</span>
+        <p>months</p>
+      </div>
+      <div class="text-[3rem] sm:text-[5rem] font-extrabold flex gap-2 content-center items-center">
+        <span class="text-purple" id="days">_ _</span>
+        <p>days</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const i_day = document.querySelector("#day");
+    const i_month = document.querySelector("#month");
+    const i_year = document.querySelector("#year");
+
+    const v_day = document.querySelector("#days");
+    const v_month = document.querySelector("#months");
+    const v_year = document.querySelector("#years");
+
+    // Tag
+    const labels = document.getElementsByTagName("label");
+    const inputs = document.getElementsByTagName("input");
+
+    const day_validate_text = document.querySelector("#day_validate_text");
+    const month_validate_text = document.querySelector("#month_validate_text");
+    const year_validate_text = document.querySelector("#year_validate_text");
+
+    function isValidInput(textValidation, inputName) {
+      if (!inputName.validity.valid) {
+        if (!inputName.validity.valueMissing) {
+          textValidation.textContent = "Must be a valid " + inputName.name;
+        } else {
+          textValidation.textContent = "This field is required";
+        }
+        document
+          .querySelector("label[for=" + inputName.name + "]")
+          .classList.remove("text-smokey_grey");
+        document
+          .querySelector("label[for=" + inputName.name + "]")
+          .classList.add("text-light_red");
+        document
+          .querySelector("input[name=" + inputName.name + "]")
+          .classList.add("border-light_red");
+        return false;
+      } else {
+        textValidation.textContent = "";
+        document
+          .querySelector("label[for=" + inputName.name + "]")
+          .classList.add("text-smokey_grey");
+        document
+          .querySelector("label[for=" + inputName.name + "]")
+          .classList.remove("text-light_red");
+        document
+          .querySelector("input[name=" + inputName.name + "]")
+          .classList.remove("border-light_red");
+        return true;
+      }
+    }
+
+    function calculateAge(birthDate, today) {
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+      let days = today.getDate() - birthDate.getDate();
+
+      if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      return { years, months, days };
+    }
+
+    function submitBirthDay() {
+      const isDayValid = isValidInput(day_validate_text, i_day);
+      const isMonthValid = isValidInput(month_validate_text, i_month);
+      const isYearValid = isValidInput(year_validate_text, i_year);
+
+      if (isDayValid && isMonthValid && isYearValid) {
+        const today = new Date();
+        const birthDate = new Date(`${i_year.value}-${i_month.value}-${i_day.value}`);
+
+
+
+        const { years, months, days } = calculateAge(birthDate, today);
+
+        v_day.textContent = days;
+        v_month.textContent = months;
+        v_year.textContent = years;
+      }
+    }
+  </script>
+
+</body>
+
+</html>
